@@ -1,10 +1,10 @@
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using WebApi.Core;
 using WebApi.Core.DomainModel.Entities;
-using Microsoft.EntityFrameworkCore;
 [assembly: InternalsVisibleTo("WebApiTest")]
 namespace WebApi.Data; 
 
@@ -27,32 +27,40 @@ internal class DataContext(
    #region methods
    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
       
+      // https://learn.microsoft.com/de-de/ef/core/logging-events-diagnostics/simple-logging
+      
       var loggerFactory = LoggerFactory.Create(builder => {
-         builder.AddDebug();
+         builder
+            .SetMinimumLevel(LogLevel.Information)
+            .AddDebug()
+            .AddConsole();
       });
       _logger = loggerFactory.CreateLogger<DataContext>();
       
       // Configure logging
       optionsBuilder
          .UseLoggerFactory(loggerFactory)
+         .LogTo(Console.WriteLine, LogLevel.Information)
+         .LogTo(message => Debug.WriteLine(message), LogLevel.Information)
          .EnableSensitiveDataLogging(true)
          .EnableDetailedErrors();
    }
    
-   public async Task<bool> SaveAllChangesAsync() {
+   public async Task<bool> SaveAllChangesAsync(string? text = null) {
       
       // log repositories before transfer to the database
       var view = ChangeTracker.DebugView.LongView;
-      Console.WriteLine(view);
-      _logger?.LogDebug("\n{1}",view);
+      Console.WriteLine($"{text}\n{view}");
+      Debug.WriteLine($"{text}\n{view}");
+      _logger.LogInformation("\n{view}",view);
       
       // save all changes to the database, returns the number of rows affected
       var result = await SaveChangesAsync();
       
       // log repositories after transfer to the database
-      _logger?.LogDebug("SaveChanges {1}",result);
-      _logger?.LogDebug("\n{1}",ChangeTracker.DebugView.LongView);
-      
+      _logger.LogInformation("SaveChanges {result}",result);
+
+      _logger.LogInformation("\n{view}",ChangeTracker.DebugView.LongView);
       return result>0;
    }
    
@@ -60,7 +68,7 @@ internal class DataContext(
       ChangeTracker.Clear();
 
    public void LogChangeTracker(string text) =>
-      _logger?.LogDebug("{1}\n{2}", text, ChangeTracker.DebugView.LongView);
+      _logger?.LogInformation("{text}\n{change}", text, ChangeTracker.DebugView.LongView);
    #endregion
    
    #region static methods

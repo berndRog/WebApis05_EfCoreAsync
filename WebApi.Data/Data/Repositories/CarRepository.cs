@@ -11,11 +11,17 @@ internal class CarRepository(
    private readonly DbSet<Person> _dbSetPeople = dataContext.People; // => Set<Person>
    private readonly DbSet<Car> _dbSetCars = dataContext.Cars; // => Set<Car>
 
-   public async Task<IEnumerable<Car>> SelectAllAsync() =>
-      await _dbSetCars.ToListAsync();
-   
-   public async Task<Car?> FindByIdAsync(Guid id) =>
-      await _dbSetCars.FirstOrDefaultAsync(car => car.Id == id);
+   public async Task<IEnumerable<Car>> SelectAllAsync() {
+      var cars = await _dbSetCars.ToListAsync();
+      dataContext.LogChangeTracker("Car: SelectAllAsync ");
+      return cars;
+   }
+
+   public async Task<Car?> FindByIdAsync(Guid id) {
+      var car = await _dbSetCars.FirstOrDefaultAsync(car => car.Id == id);
+      dataContext.LogChangeTracker("Car: FindByIdAsync ");
+      return car;
+   }
 
    public async Task AddAsync(Car car) =>
       await _dbSetCars.AddAsync(car);
@@ -31,13 +37,16 @@ internal class CarRepository(
       if (cFound == null) throw new Exception("Car to be removed not found");
       _dbSetCars.Remove(cFound);
    }
-   
-   public async Task<IEnumerable<Car>> SelectByPersonIdAsync(Guid personId) =>
-      _dbSetPeople
+
+   public async Task<IEnumerable<Car>> SelectByPersonIdAsync(Guid personId) {
+      var cars = _dbSetPeople
          .Where(person => person.Id == personId)
-         .SelectMany(person =>  person.Cars)
+         .SelectMany(person => person.Cars)
          .ToList();
-   
+      dataContext.LogChangeTracker("Car: SelectByPersonIdAsync ");
+      return cars;
+   }
+
    public async Task<IEnumerable<Car>> SelectByAttributesAsync(
       string? maker = null, 
       string? model = null,
@@ -61,6 +70,8 @@ internal class CarRepository(
       if (priceMax.HasValue)
          query = query.Where(car => car.Price <= priceMax.Value);
 
-      return await query.ToListAsync();
+      var cars = await query.ToListAsync();
+      dataContext.LogChangeTracker("Car: SelectByAttributesAsync ");
+      return cars;
    }
 }

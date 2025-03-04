@@ -131,7 +131,7 @@ public class CarsController(
       
       // add car to repository and save changes
       await carRepository.AddAsync(car); 
-      await dataContext.SaveAllChangesAsync();
+      await dataContext.SaveAllChangesAsync("Create Car");
       
       // return created car as Dto
       var requestPath = Request?.Path ?? $"http://localhost:5200/carshop/cars/{car.Id}";
@@ -175,7 +175,7 @@ public class CarsController(
       
       // save to repository and write changes 
       await carRepository.UpdateAsync(car);
-      await dataContext.SaveAllChangesAsync();
+      await dataContext.SaveAllChangesAsync("Update Car");
       
       return Ok(car.ToCarDto());
    }
@@ -189,7 +189,7 @@ public class CarsController(
    [EndpointSummary("Delete a car for a given person")]
    [ProducesResponseType(StatusCodes.Status204NoContent)]
    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
-   public async Task<IActionResult> Delete(
+   public async Task<ActionResult<ProblemDetails>> Delete(
       [Description("Unique id for the given person")] 
       [FromRoute] Guid personId,
       [Description("Unique id for the given car")] 
@@ -197,7 +197,8 @@ public class CarsController(
    ) {
       // find person in the repository
       var person = await personRepository.FindByIdAsync(personId);
-      if(person == null) return NotFound("Delete Car: Person not found.");
+      if(person == null) 
+         return helper.DetailsNotFound<ProblemDetails>("Delete Car: Person not found.");
       // find car in the repository
       var car = await carRepository.FindByIdAsync(id); 
       if(car == null) return NotFound("Delete Car: Car not found.");
@@ -207,7 +208,7 @@ public class CarsController(
       
       // save to repository and write changes 
       await carRepository.RemoveAsync(car);
-      await dataContext.SaveAllChangesAsync();
+      await dataContext.SaveAllChangesAsync("Delete Car");
 
       // return no content
       return NoContent(); 

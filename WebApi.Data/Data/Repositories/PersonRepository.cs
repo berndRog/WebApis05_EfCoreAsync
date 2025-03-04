@@ -10,18 +10,26 @@ internal class PersonRepository(
    private readonly IDataContext _dataContext = dataContext;
    private readonly DbSet<Person> _dbSetPeople = dataContext.People; // => Set<Person>
 
-   public async Task<IEnumerable<Person>> SelectAllAsync() => 
-      await _dbSetPeople.ToListAsync();
-   
-   public async Task<Person?> FindByIdAsync(Guid id) =>
-      await _dbSetPeople.FirstOrDefaultAsync(person => person.Id == id);
-   
+   public async Task<IEnumerable<Person>> SelectAllAsync() {
+      var people = await _dbSetPeople.ToListAsync();
+      dataContext.LogChangeTracker("Person: SelectAllAsync ");
+      return people;
+   }
+
+   public async Task<Person?> FindByIdAsync(Guid id) {
+      var person = await _dbSetPeople.FirstOrDefaultAsync(person => person.Id == id);
+      dataContext.LogChangeTracker("Person: FindByIdAsync");
+      return person;
+   }
+
    public async Task<Person?> FindByNameAsync(string name) {
       var tokens = name.Trim().Split(" ");
       var firstName = string.Join(" ", tokens.Take(tokens.Length - 1));
       var lastName = tokens.Last();
-      return await _dbSetPeople.FirstOrDefaultAsync(person =>
+      var person = await _dbSetPeople.FirstOrDefaultAsync(person =>
          person.FirstName == firstName && person.LastName == lastName);
+      dataContext.LogChangeTracker("Person: FindByNameAsync");
+      return person;
    }
 
    public async Task AddAsync(Person person) =>
@@ -40,4 +48,14 @@ internal class PersonRepository(
       _dbSetPeople.Remove(pFound);
    }
 
+   public async Task<Person?> FindByIdWithCarsAsync(Guid id) {
+      var person =
+         await _dbSetPeople
+            .Where(person => person.Id == id)
+            .Include(person => person.Cars)
+            .FirstOrDefaultAsync();
+      dataContext.LogChangeTracker("Person: FindByIdWithCarsAsync");
+      return person;
+
+   }
 }

@@ -8,5 +8,9 @@ public interface IPersonRepository {
    
    Task AddAsync(Person person);
    Task UpdateAsync(Person updPerson);
-   Task RemoveAsync(Person person);
+   Task RemoveAsync(Person person); 
+   
+   //-- Join Cars -------------------------------------------------------------- 
+   Task<Person?> FindByIdWithCarsAsync(Guid id);
+   
 }

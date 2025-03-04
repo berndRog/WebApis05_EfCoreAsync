@@ -38,7 +38,8 @@ public class PersonController(
       [Description("Unique id of the person to be found")]
       [FromRoute] Guid id
    ) {
-      return await personRepository.FindByIdAsync(id) switch {
+      return await personRepository.FindByIdAsync(id) switch { 
+    //return await personRepository.FindByIdWithCarsAsync(id) switch {   
          Person person => Ok(person.ToPersonDto()),
          null => helper.DetailsNotFound<PersonDto>("Person with given id not found")
       };
@@ -73,7 +74,7 @@ public class PersonController(
       
       // add person to repository and save changes
       await personRepository.AddAsync(person);
-      await dataContext.SaveAllChangesAsync();
+      await dataContext.SaveAllChangesAsync("Create Person");
       
       return Created($"/people/{person.Id}", person.ToPersonDto());
    }
@@ -104,7 +105,7 @@ public class PersonController(
       
       // update person in the repository and save changes
       await personRepository.UpdateAsync(person);
-      await dataContext.SaveAllChangesAsync();
+      await dataContext.SaveAllChangesAsync("Update Person");
       
       return Ok(person.ToPersonDto());
    }
@@ -127,7 +128,7 @@ public class PersonController(
      
       // remove person from the repository and save changes
       await personRepository.RemoveAsync(person);
-      await dataContext.SaveAllChangesAsync();
+      await dataContext.SaveAllChangesAsync("Delete Person");
       
       return NoContent();
    }
