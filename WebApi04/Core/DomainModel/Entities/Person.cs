@@ -1,19 +1,23 @@
-using WebApi.Core.Dtos;
+using System.Text.Json.Serialization;
 namespace WebApi.Core.DomainModel.Entities; 
 
 public class Person: AEntity {
-
-   // properties with getter only
+   
    public override Guid Id { get; init; } = Guid.NewGuid();
    public string FirstName { get; private set; } = string.Empty;
    public string LastName { get; private set; } = string.Empty;
    public string? Email { get; private set; }
    public string? Phone { get; private set; } 
-   // navigation property Person -> Car [0..*]
+   // 1:n navigation collection Person <-> Cars (0,1):(0,n)
    public ICollection<Car> Cars { get; private set; } = [];
    
-   // EF Core requires a constructor
-   internal Person() { }
+   // ctor EF Core.
+   // EF Coreuses this ctor and reflexion to construct new Person object,
+   // while ignoring private set in the properties
+   public Person() { } 
+   
+   // ctor Domain Model
+   [JsonConstructor]
    public Person(Guid id, string firstName, string lastName, string? email = null,
       string? phone = null) {
       Id = id;
@@ -29,14 +33,14 @@ public class Person: AEntity {
       if(phone != null) Phone = phone;
    } 
    
-   public void Update (Person updPerson) {
-      FirstName = updPerson.FirstName;
-      LastName = updPerson.LastName;
-      if(updPerson.Email != null) Email = updPerson.Email;
-      if(updPerson.Phone != null) Phone = updPerson.Phone;
+   public void Update(string firstName, string lastName, string? email = null, string? phone = null) {
+      FirstName = firstName;
+      LastName = lastName;
+      if(email != null) Email = email;
+      if(phone != null) Phone = phone;
    }
    
-   // methods car
+   // 1:n Person <-> Cars
    public void AddCar(Car car) {
       car.Set(this);
       Cars.Add(car);
@@ -45,7 +49,4 @@ public class Person: AEntity {
       car.Set(null);
       Cars.Remove(car);
    }
-   
-   public PersonDto ToPersonDto() =>
-      new PersonDto(Id, FirstName, LastName, Email, Phone);
 }
