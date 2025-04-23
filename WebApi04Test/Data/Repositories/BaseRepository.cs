@@ -8,7 +8,7 @@ using WebApi.Core;
 using WebApi.Data;
 using WebApiTest;
 using WebApiTest.Di;
-using WebApiTest.Data.Repositories;
+using WebApiTest.Persistence.Repositories;
 using Xunit;
 namespace WebApiTest.Data.Repositories;
 [Collection(nameof(SystemTestCollectionDefinition))]
@@ -74,7 +74,7 @@ public abstract class BaseRepository {
          JsonSerializer.Serialize(obj, new JsonSerializerOptions {
             WriteIndented = true,
             ReferenceHandler = ReferenceHandler.IgnoreCycles
-            //  MaxDepth = 2
+          //  MaxDepth = 2
          });
    }
 }

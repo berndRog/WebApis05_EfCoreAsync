@@ -46,7 +46,6 @@ public class Person: AEntity {
       Cars.Add(car);
    }
    public void RemoveCar(Car car) {
-      car.Set(null);
       Cars.Remove(car);
    }
 }

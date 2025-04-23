@@ -13,7 +13,7 @@ namespace WebApi.Controllers.V2;
 [ApiController]
 [Consumes("application/json")] //default
 [Produces("application/json")] //default
-public class PersonController(
+public class PeopleController(
    IPeopleRepository peopleRepository,
    IDataContext dataContext
    //ILogger<PersonController> logger
@@ -24,8 +24,10 @@ public class PersonController(
    [EndpointSummary("Get all people")] 
    [ProducesResponseType(StatusCodes.Status200OK)]
    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
-   public async Task<ActionResult<IEnumerable<PersonDto>>> GetAllAsync() {
-      return await peopleRepository.SelectAllAsync() switch {   
+   public async Task<ActionResult<IEnumerable<PersonDto>>> GetAllAsync(
+      CancellationToken ctToken = default // default = CancellationToken.None
+   ) {
+      return await peopleRepository.SelectAllAsync(ctToken) switch {   
          IEnumerable<Person> people => Ok(people.Select(p => p.ToPersonDto())),
          null => NotFound("People not found")
       };
@@ -36,29 +38,14 @@ public class PersonController(
    [EndpointSummary("Get person by id")]
    [ProducesResponseType<PersonDto>(StatusCodes.Status200OK)]
    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
-   public async Task<ActionResult<PersonDto>> GetByIdAsync(
+   public async Task<ActionResult<PersonDto?>> GetByIdAsync(
       [Description("Unique id of the person to be found")]
-      [FromRoute] Guid id
+      [FromRoute] Guid id,
+      CancellationToken ctToken = default
    ) {
-      return await peopleRepository.FindByIdAsync(id) switch { 
+      return await peopleRepository.FindByIdAsync(id, ctToken) switch { 
          Person person => Ok(person.ToPersonDto()),
          null => NotFound("Person with given id not found")
-      };
-   }
-   
-   // get person by lastname http://localhost:5200/carshop/v2/people/name?name={name}
-   // using sql "like" operation, i.e. name must be a part of the lastname
-   [HttpGet("people/name")]
-   [EndpointSummary("Get person by name")]
-   [ProducesResponseType(StatusCodes.Status200OK)]
-   [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
-   public async Task<ActionResult<IEnumerable<PersonDto>?>> GetByNameAsync(
-      [Description("Name to be search for")]
-      [FromQuery] string name
-   ) {
-      return await peopleRepository.SelectByNameAsync(name) switch {
-         IEnumerable<Person> people => Ok(people.Select(p => p.ToPersonDto())),
-         null => NotFound("Person with given name not found")
       };
    }
    
@@ -67,21 +54,30 @@ public class PersonController(
    [EndpointSummary("Create a new person")]
    [ProducesResponseType(StatusCodes.Status201Created)]
    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
-   public async Task<ActionResult<PersonDto>> CreateAsync(
+   public async Task<ActionResult<PersonDto?>> CreateAsync(
       [Description("PersonDto with the new person's data")]
-      [FromBody] PersonDto personDto
+      [FromBody] PersonDto personDto,
+      CancellationToken ctToken = default
    ) {
-      if(await peopleRepository.FindByIdAsync(personDto.Id) != null) 
-         BadRequest("Person with given id already exists"); 
+      if(await peopleRepository.FindByIdAsync(personDto.Id,ctToken) != null) 
+         return BadRequest("Person with given id already exists"); 
       
       // map dto to entity
       var person = personDto.ToPerson();
       
       // add person to repository and save changes
-      await peopleRepository.AddAsync(person);
-      await dataContext.SaveAllChangesAsync("Create Person");
+      peopleRepository.Add(person);
+      await dataContext.SaveAllChangesAsync("Create Person", ctToken);
       
-      return Created($"/people/{person.Id}", person.ToPersonDto());
+      // return an absolute URL as location 
+      var url = "";
+      if (Request != null) 
+         url = Request?.Scheme + "://" + Request?.Host
+            + Request?.Path.ToString() +$"/{person.Id}";
+      else 
+         url = $"http://localhost:5200/carshop/v2/people/{person.Id}";
+      var uri = new Uri(url, UriKind.Absolute);
+      return Created(uri, person.ToPersonDto()); 
    }
  
    // update a person http://localhost:5200/carshop/v2/people/{id}
@@ -90,18 +86,19 @@ public class PersonController(
    [ProducesResponseType(StatusCodes.Status200OK)]
    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
-   public async Task<ActionResult<PersonDto>> UpdateAsync(
+   public async Task<ActionResult<PersonDto?>> UpdateAsync(
       [Description("Unique id of the existing person")]
       [FromRoute] Guid id,
       [Description("PersonDto with the updated person's data")]
-      [FromBody] PersonDto updPersonDto
+      [FromBody] PersonDto updPersonDto,
+      CancellationToken ctToken = default
    ) {
       // check if the id in the route and in the body match
       if (id != updPersonDto.Id) 
          return BadRequest("Id in the route and in the body do not match");
 
       // find person in the repository
-      var person = await peopleRepository.FindByIdAsync(id);
+      var person = await peopleRepository.FindByIdAsync(id, ctToken);
       if (person == null) return NotFound("Person with given id not found");
       
       // map dto to entity
@@ -112,7 +109,7 @@ public class PersonController(
       
       // update person in the repository and save changes
       peopleRepository.Update(person);
-      await dataContext.SaveAllChangesAsync("Update Person");
+      await dataContext.SaveAllChangesAsync("Update Person", ctToken);
       
       return Ok(person.ToPersonDto());
    }
@@ -122,18 +119,37 @@ public class PersonController(
    [EndpointSummary("Delete a person")]
    [ProducesResponseType(StatusCodes.Status204NoContent)]
    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
-   public async Task<IActionResult> Delete(
+   public async Task<IActionResult> DeleteAsync(
       [Description("Unique id of the existing person")]
-      [FromRoute] Guid id
+      [FromRoute] Guid id,
+      CancellationToken ctToken = default
    ) {
       // find person in the repository
-      var person = await peopleRepository.FindByIdAsync(id);
+      var person = await peopleRepository.FindByIdAsync(id, ctToken);
       if (person == null) return NotFound();
      
       // remove person from the repository and save changes
       peopleRepository.Remove(person);
-      await dataContext.SaveAllChangesAsync("Delete Person");
+      await dataContext.SaveAllChangesAsync("Delete Person", ctToken);
       
       return NoContent();
    }
+   
+   // get person by lastname http://localhost:5200/carshop/v2/people/name?name={name}
+   // using sql "like" operation, i.e. name must be a part of the lastname
+   [HttpGet("people/name")]
+   [EndpointSummary("Get person by name")]
+   [ProducesResponseType(StatusCodes.Status200OK)]
+   [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
+   public async Task<ActionResult<IEnumerable<PersonDto>>> GetByNameAsync(
+      [Description("Name to be search for")]
+      [FromQuery] string name,
+      CancellationToken ctToken = default
+   ) {
+      return await peopleRepository.SelectByNameAsync(name, ctToken) switch {
+         IEnumerable<Person> people => Ok(people.Select(p => p.ToPersonDto())),
+         null => NotFound("Person with given name not found")
+      };
+   }
+
 }

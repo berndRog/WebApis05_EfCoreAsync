@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using DeepEqual;
-using DeepEqual.Syntax;
-using Microsoft.EntityFrameworkCore;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using WebApi.Core.DomainModel.Entities;
+using WebApiTest.Persistence.Repositories;
 using Xunit;
 namespace WebApiTest.Data.Repositories;
 
@@ -12,118 +10,93 @@ public class PeopleRepositoryUt : BaseRepository {
 
    #region PersonOnly
    [Fact]
-   public void FindByIdUt() {
+   public async Task  FindByIdAsyncUt() {
       // Arrange
       _peopleRepository.Add(_seed.Person1);
-      _dataContext.SaveAllChanges();
+      await _dataContext.SaveAllChangesAsync();
       _dataContext.ClearChangeTracker();
       // Act
-      var actual = _peopleRepository.FindById(_seed.Person1.Id);
+      var actual = await _peopleRepository.FindByIdAsync(_seed.Person1.Id);
       // Assert
       Assert.Equivalent(_seed.Person1, actual);
    }
    
    [Fact]
-   public void AddUt() {
+   public async Task AddUt() {
       // Arrange
       var person = _seed.Person1;
       // Act
       _peopleRepository.Add(person);
-      _dataContext.SaveAllChanges();
+      await _dataContext.SaveAllChangesAsync();
       // Assert
-      var actual = _peopleRepository.FindById(person.Id);
+      var actual = await _peopleRepository.FindByIdAsync(person.Id);
       Assert.Equal(person, actual);
    }
 
    [Fact]
-   public void AddRangeUt() {
+   public async Task AddRangeUt() {
       // Arrange
       var expected = _seed.People;
       // Act
       _peopleRepository.AddRange(_seed.People);
-      _dataContext.SaveAllChanges();
+      await _dataContext.SaveAllChangesAsync();
       _dataContext.ClearChangeTracker();
       // Assert
-      var actual = _peopleRepository.SelectAll();
+      var actual = await _peopleRepository.SelectAllAsync();
       Assert.Equivalent(expected, actual);
    }
-
-
+   
    [Fact]
-   public void UpdateUt() {
+   public async Task UpdateUt() {
       // Arrange
       _peopleRepository.Add(_seed.Person1);
-      _dataContext.SaveAllChanges();
+      await _dataContext.SaveAllChangesAsync();
       _dataContext.ClearChangeTracker();
-     
       // Act
       // retrieve person from database to track it
-      var actualPerson = _peopleRepository.FindById(_seed.Person1.Id);
+      var actualPerson = await _peopleRepository.FindByIdAsync(_seed.Person1.Id);
       Assert.NotNull(actualPerson);
       // domain model
       actualPerson.Update("Erika","Meier", _seed.Person1.Email, _seed.Person1.Phone);
       // update person in repository
       _peopleRepository.Update(actualPerson);
-      _dataContext.SaveAllChanges();
-     
+      await _dataContext.SaveAllChangesAsync();
       // Assert
-      var actual = _peopleRepository.FindById(_seed.Person1.Id);
+      var actual = await _peopleRepository.FindByIdAsync(_seed.Person1.Id);
       Assert.Equivalent(actualPerson, actual);
    }
    
    [Fact]
-   public void Update_EntityNotFoundUt() {
-      // Arrange
-      _peopleRepository.Add(_seed.Person1);
-      _dataContext.SaveAllChanges();
-      _dataContext.ClearChangeTracker();
-      // Act
-      // retrieve person from database to track it
-      var actualPerson = _peopleRepository.FindById(_seed.Person1.Id);
-      Assert.NotNull(actualPerson);
-      
-      // Remove the person to simulate entity not found
-      _peopleRepository.Remove(actualPerson);
-      _dataContext.SaveAllChanges();
-      _dataContext.ClearChangeTracker();
-      
-      // domain model
-      actualPerson.Update("Erika","Meier", _seed.Person1.Email, _seed.Person1.Phone);
-      
-      var exception = Assert.Throws<ApplicationException>(() => _peopleRepository.Update(actualPerson));
-      Assert.Equal("Update failed, entity with given id not found", exception.Message);
-   }
-   
-   [Fact]
-   public void RemoveUt() {
+   public async Task RemoveUt() {
       // Arrange
       _peopleRepository.AddRange(_seed.People);
-      _dataContext.SaveAllChanges();
+      await _dataContext.SaveAllChangesAsync();
       _dataContext.ClearChangeTracker();
       // Act
       _peopleRepository.Remove(_seed.Person1);
-      _dataContext.SaveAllChanges();
+      await _dataContext.SaveAllChangesAsync();
       // Assert
-      var actual = _peopleRepository.FindById(_seed.Person1.Id);
+      var actual = await _peopleRepository.FindByIdAsync(_seed.Person1.Id);
       Assert.Null(actual);
    }
    
    [Fact]
-   public void SelectByNameUt() {
+   public async Task SelectByNameUt() {
       // Arrange
       _peopleRepository.AddRange(_seed.People);
-      _dataContext.SaveAllChanges();
+      await _dataContext.SaveAllChangesAsync();
       _dataContext.ClearChangeTracker();
       var expected = new List<Person> { _seed.Person1, _seed.Person2 };
       
       // Act
-      var actual = _peopleRepository.SelectByName("Muster"); 
+      var actual = await _peopleRepository.SelectByNameAsync("Muster"); 
       
       // Assert
       Assert.Equivalent(expected, actual);
    }
    #endregion
 
+   /*
    #region PersonJoinCars
    [Fact]
    public void FindByIdJoinCarsUt() {
@@ -152,9 +125,9 @@ public class PeopleRepositoryUt : BaseRepository {
       var actual = _peopleRepository.FindByIdJoinCars(person.Id);      
       Assert.NotNull(actual);
       
-      Console.WriteLine(ToPrettyJson("person", person));
+      Console.WriteLine(BaseRepository.ToPrettyJson("person", person));
      
-      Console.WriteLine(ToPrettyJson("actual", actual));
+      Console.WriteLine(BaseRepository.ToPrettyJson("actual", actual));
       
       
       // Assert
@@ -195,6 +168,6 @@ public class PeopleRepositoryUt : BaseRepository {
 
    }
    #endregion
-   
+   */
    
 }

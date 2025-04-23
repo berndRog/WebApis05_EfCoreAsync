@@ -1,18 +1,11 @@
-﻿using System;
-
+﻿
 using WebApi.Core.DomainModel.Entities;
-using Microsoft.VisualBasic;
-using WebApi.Core.DomainModel.NullEntities;
 using Xunit;
 
 namespace WebApiTest.Core.DomainModel.Entities;
 public class CarUt {
 
-   private readonly Seed _seed;
-   
-   public CarUt() {
-      _seed = new Seed();
-   }
+   private readonly Seed _seed = new ();
 
    [Fact]
    public void CtorStdUt() {
@@ -83,18 +76,6 @@ public class CarUt {
       Assert.Equal(person.Id, car.PersonId);
    }
    
-   [Fact]
-   public void SetPersonToNullPersonUt() {
-      // Arrange
-      var person = _seed.Person1;
-      var car = _seed.Car1;
-      person.AddCar(car); // setPerson is called by AddCar
-      // Act
-      person.RemoveCar(car);
-      // Assert
-      Assert.Equivalent(NullPerson.Instance, car.Person);
-      Assert.Equal(NullPerson.Instance.Id, car.PersonId);
-   }
    
    [Fact]
    public void UpdateUt() {

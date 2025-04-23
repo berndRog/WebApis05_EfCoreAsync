@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using WebApi.Core;
 using WebApi.Data;
 using WebApi.Data.Repositories;
@@ -21,9 +19,9 @@ public static class DiData {
       switch (useDatabase) {
          case "LocalDb":
          case "SqlServer":
-            services.AddDbContext<IDataContext, DataContext>(options => 
-               options.UseSqlServer(dataSource)
-            );
+            // services.AddDbContext<IDataContext, DataContext>(options => 
+            //    options.UseSqlServer(dataSource)
+            // );
             break;
          case "Sqlite": 
          case "SqliteInMemory":

@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using WebApi.Core.DomainModel.NullEntities;
 namespace WebApi.Core.DomainModel.Entities;
 
 public class Car: AEntity {
@@ -9,10 +8,10 @@ public class Car: AEntity {
    public string Model {get; private set;} = string.Empty;
    public int Year {get; private set;} = 1900;
    public decimal Price {get; private set;}
-   public string? ImageUrl { get; private set; } = null;
+   public string? ImageUrl { get; private set; }
    // navigation property
-   public Guid PersonId { get; private set; } = NullPerson.Instance.Id;
-   public Person Person { get; private set; } = NullPerson.Instance;
+   public Person Person { get; private set; } = null!;
+   public Guid PersonId { get; private set; } 
 
    // ctor EF Core.
    // EF Coreuses this ctor and reflexion to construct new Person object,
@@ -35,15 +34,9 @@ public class Car: AEntity {
    public void SetImageUrl(string imageUrl) =>
       ImageUrl = imageUrl;
 
-   public void Set(Person? person) {
-      if (person != null) {
-         PersonId = person.Id;
-         Person = person;
-      }
-      else {
-         PersonId = NullPerson.Instance.Id;
-         Person = NullPerson.Instance;
-      }
+   public void Set(Person person) {
+      Person = person;
+      PersonId = person.Id;
    }
 
    public void Update(

@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi04", "WebApi04\WebApi04.csproj", "{8A3AC649-5216-4648-901B-BC24A663356B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi04Test", "WebApi04Test\WebApi04Test.csproj", "{5C3377FA-3541-4D3E-9A54-A5A4010FC9A8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,6 +14,10 @@ Global
 		{8A3AC649-5216-4648-901B-BC24A663356B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A3AC649-5216-4648-901B-BC24A663356B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8A3AC649-5216-4648-901B-BC24A663356B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C3377FA-3541-4D3E-9A54-A5A4010FC9A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C3377FA-3541-4D3E-9A54-A5A4010FC9A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C3377FA-3541-4D3E-9A54-A5A4010FC9A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C3377FA-3541-4D3E-9A54-A5A4010FC9A8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection

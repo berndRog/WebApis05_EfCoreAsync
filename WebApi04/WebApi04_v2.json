@@ -6,239 +6,6 @@
     "version": "v2"
   },
   "paths": {
-    "/carshop/v2/images/{filename}": {
-      "get": {
-        "tags": [
-          "Images"
-        ],
-        "parameters": [
-          {
-            "name": "filename",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/FileStreamResult"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FileStreamResult"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/FileStreamResult"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Images"
-        ],
-        "parameters": [
-          {
-            "name": "filename",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "No Content"
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/carshop/v2/images": {
-      "post": {
-        "tags": [
-          "Images"
-        ],
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": { }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "415": {
-            "description": "Unsupported Media Type",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/carshop/v2/images/exists/{filename}": {
-      "get": {
-        "tags": [
-          "Images"
-        ],
-        "parameters": [
-          {
-            "name": "filename",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "filename",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/carshop/v2/cars": {
       "get": {
         "tags": [
@@ -289,6 +56,17 @@
                   "$ref": "#/components/schemas/CarDto"
                 }
               }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": { }
             }
           }
         }
@@ -341,6 +119,17 @@
           },
           "400": {
             "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": { }
+            }
+          },
+          "404": {
+            "description": "Not Found",
             "content": {
               "application/problem+json": {
                 "schema": {
@@ -604,7 +393,7 @@
     "/carshop/v2/people": {
       "get": {
         "tags": [
-          "Person"
+          "People"
         ],
         "summary": "Get all people",
         "responses": {
@@ -636,7 +425,7 @@
       },
       "post": {
         "tags": [
-          "Person"
+          "People"
         ],
         "summary": "Create a new person",
         "requestBody": {
@@ -683,7 +472,7 @@
     "/carshop/v2/people/{id}": {
       "get": {
         "tags": [
-          "Person"
+          "People"
         ],
         "summary": "Get person by id",
         "parameters": [
@@ -724,7 +513,7 @@
       },
       "put": {
         "tags": [
-          "Person"
+          "People"
         ],
         "summary": "Update a person",
         "parameters": [
@@ -792,7 +581,7 @@
       },
       "delete": {
         "tags": [
-          "Person"
+          "People"
         ],
         "summary": "Delete a person",
         "parameters": [
@@ -831,7 +620,7 @@
     "/carshop/v2/people/name": {
       "get": {
         "tags": [
-          "Person"
+          "People"
         ],
         "summary": "Get person by name",
         "parameters": [
@@ -916,45 +705,6 @@
           }
         }
       },
-      "EntityTagHeaderValue": {
-        "type": "object",
-        "properties": {
-          "tag": {
-            "$ref": "#/components/schemas/StringSegment"
-          },
-          "isWeak": {
-            "type": "boolean"
-          }
-        },
-        "nullable": true
-      },
-      "FileStreamResult": {
-        "type": "object",
-        "properties": {
-          "fileStream": {
-            "$ref": "#/components/schemas/Stream"
-          },
-          "contentType": {
-            "type": "string",
-            "nullable": true
-          },
-          "fileDownloadName": {
-            "type": "string",
-            "nullable": true
-          },
-          "lastModified": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "entityTag": {
-            "$ref": "#/components/schemas/EntityTagHeaderValue"
-          },
-          "enableRangeProcessing": {
-            "type": "boolean"
-          }
-        }
-      },
       "PersonDto": {
         "required": [
           "id",
@@ -1010,46 +760,15 @@
             "nullable": true
           }
         }
-      },
-      "Stream": {
-        "type": "string",
-        "format": "binary"
-      },
-      "StringSegment": {
-        "type": "object",
-        "properties": {
-          "buffer": {
-            "type": "string",
-            "nullable": true
-          },
-          "offset": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "length": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "value": {
-            "type": "string",
-            "nullable": true
-          },
-          "hasValue": {
-            "type": "boolean"
-          }
-        }
       }
     }
   },
   "tags": [
     {
-      "name": "Images"
-    },
-    {
       "name": "Cars"
     },
     {
-      "name": "Person"
+      "name": "People"
     }
   ]
 }

@@ -1,9 +1,3 @@
-using Microsoft.AspNetCore.HttpLogging;
-using WebApi.Controllers.V2;
-using WebApi.Core;
-using WebApi.Data;
-using WebApi.Data.Repositories;
-using WebApi.Di;
 namespace WebApi;
 
 public class Program {
@@ -19,6 +13,7 @@ public class Program {
       // add http logging 
       builder.Services.AddHttpLogging();
       
+
       // Add ProblemDetails, see https://tools.ietf.org/html/rfc7807
       builder.Services.AddProblemDetails();
       
@@ -26,8 +21,8 @@ public class Program {
       builder.Services.AddControllers();
       builder.Services.AddData(builder.Configuration);
       
-      // Add versioning
-      builder.Services.AddApiVersioning();
+      // Add versioning (starts with 2)
+      builder.Services.AddApiVersioning(2);
       
       // Add OpenApi
       builder.Services.AddOpenApiSettings("v1");

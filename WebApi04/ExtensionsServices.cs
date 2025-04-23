@@ -1,14 +1,45 @@
 using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.OpenApi;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using WebApi.Core;
+using WebApi.Data;
+using WebApi.Data.Repositories;
 namespace WebApi;
 
 public static class ExtensionsServices {
+   
+   #region AddData
+   public static IServiceCollection AddData(
+      this IServiceCollection services,
+      IConfiguration configuration
+   ) {
 
+      services.AddScoped<IPeopleRepository, PeopleRepository>();
+      services.AddScoped<ICarsRepository, CarsRepository>();
+
+      // Add DbContext (Database) to DI-Container
+      var (useDatabase, dataSource) = DataContext.EvalDatabaseConfiguration(configuration);
+
+      switch (useDatabase) {
+         case "Sqlite": 
+         case "SqliteInMemory":
+            services.AddDbContext<IDataContext, DataContext>(options => 
+               options.UseSqlite(dataSource)
+            );
+            break;
+         default:
+            throw new Exception("appsettings.json UseDatabase not available");
+      }
+      return services;
+   }
+   #endregion
+   
    #region AddApiVersioning
    public static IServiceCollection AddApiVersioning(
-      this IServiceCollection services
+      this IServiceCollection services,
+      int startVersion = 1
    ) {
 
       var apiVersionReader = ApiVersionReader.Combine(
@@ -19,16 +50,14 @@ public static class ExtensionsServices {
       );
 
       services.AddApiVersioning(options => {
-            options.AssumeDefaultVersionWhenUnspecified = true;
-            options.DefaultApiVersion = new ApiVersion(1, 0);
-            options.ReportApiVersions = true;
-            options.ApiVersionReader = apiVersionReader;
-         })
-         //.AddMvc()
-         .AddApiExplorer(options => {
-            options.GroupNameFormat = "'v'VVV";
-            options.SubstituteApiVersionInUrl = true;
-         });
+         options.AssumeDefaultVersionWhenUnspecified = true;
+         options.DefaultApiVersion = new ApiVersion(2, 0);
+         options.ReportApiVersions = true;
+         options.ApiVersionReader = apiVersionReader;
+      }).AddApiExplorer(options => {
+         options.GroupNameFormat = "'v'VVV";
+         options.SubstituteApiVersionInUrl = true;
+      });
       return services;
    }
    #endregion

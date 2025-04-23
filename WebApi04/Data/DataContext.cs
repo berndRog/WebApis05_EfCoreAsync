@@ -45,21 +45,24 @@ public class DataContext(
          .EnableDetailedErrors();
    }
    
-   public async Task<bool> SaveAllChangesAsync(string? text = null) {
+   public async Task<bool> SaveAllChangesAsync(
+      string? text = null,
+      CancellationToken ctToken = default 
+   ) {
       
       // log repositories before transfer to the database
       var view = ChangeTracker.DebugView.LongView;
       Console.WriteLine($"{text}\n{view}");
       Debug.WriteLine($"{text}\n{view}");
-      _logger.LogInformation("\n{view}",view);
+      _logger?.LogInformation("\n{view}",view);
       
       // save all changes to the database, returns the number of rows affected
-      var result = await SaveChangesAsync();
+      var result = await SaveChangesAsync(ctToken);
       
       // log repositories after transfer to the database
-      _logger.LogInformation("SaveChanges {result}",result);
+      _logger?.LogInformation("SaveChanges {result}",result);
 
-      _logger.LogInformation("\n{view}",ChangeTracker.DebugView.LongView);
+      _logger?.LogInformation("\n{view}",ChangeTracker.DebugView.LongView);
       return result>0;
    }
    

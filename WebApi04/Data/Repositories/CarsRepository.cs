@@ -5,25 +5,28 @@ using WebApi.Data.Repositories_refactored;
 namespace WebApi.Data.Repositories;
 
 public class CarsRepository(
-   DataContext dc
-) : ABaseRepository<Car>(dc), ICarsRepository {
-
-
-   public async Task<IEnumerable<Car>?> SelectByPersonIdAsync(Guid personId) {
+   DataContext dContext
+) : ABaseRepository<Car>(dContext), ICarsRepository {
+   
+   public async Task<IEnumerable<Car>> SelectByPersonIdAsync(
+      Guid personId,
+      CancellationToken ctToken = default 
+   ) {
       var cars = await _dbSet
-         .Where(person => person.Id == personId)
-         .ToListAsync();
+         .Where(car => car.PersonId == personId)
+         .ToListAsync(ctToken);
       _dataContext.LogChangeTracker("Car: SelectByPersonIdAsync ");
       return cars;
    }
 
-   public async Task<IEnumerable<Car>?> SelectByAttributesAsync(
+   public async Task<IEnumerable<Car>> SelectByAttributesAsync(
       string? maker = null, 
       string? model = null,
       int? yearMin = null,
       int? yearMax = null,
       decimal? priceMin = null,
-      decimal? priceMax = null
+      decimal? priceMax = null,
+      CancellationToken ctToken = default
    ) {
       var query = _dbSet.AsQueryable();
    
@@ -40,7 +43,7 @@ public class CarsRepository(
       if (priceMax.HasValue)
          query = query.Where(car => car.Price <= priceMax.Value);
 
-      var cars = await query.ToListAsync();
+      var cars = await query.ToListAsync(ctToken);
       _dataContext.LogChangeTracker("Car: SelectByAttributesAsync ");
       return cars;
    }
