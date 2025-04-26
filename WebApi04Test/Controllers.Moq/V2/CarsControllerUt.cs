@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using WebApi.Core.DomainModel.Entities;
 using WebApi.Core.Mapping;
+using WebApiOrmTest.Controllers.Moq.V2;
 using WebApiTest.Persistence.Repositories;
 using Xunit;
 namespace WebApiTest.Controllers.Moq;
@@ -266,7 +267,7 @@ public class CarsControllerUt : BaseControllerUt {
    }
    
    [Fact]
-   public async Task GetCarsByAttributesAsyncUt_Ok() {
+   public async Task GetByAttributesAsyncUt_Ok() {
       // Arrange People with Cars
       var (_, updCars) = Seed.InitPeopleWithCars(_seed.People, _seed.Cars);
 

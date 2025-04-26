@@ -9,9 +9,10 @@ using Moq;
 using WebApi.Core.DomainModel.Entities;
 using WebApi.Core.Dtos;
 using WebApi.Core.Mapping;
+using WebApiOrmTest.Controllers.Moq.V2;
 using WebApiTest.Persistence.Repositories;
 using Xunit;
-namespace WebApiTest.Controllers.Moq;
+namespace WebApiTest.Controllers.Moq.V2;
 
 [Collection(nameof(SystemTestCollectionDefinition))]
 public class PeopleControllerUt : BaseControllerUt {
@@ -187,7 +188,7 @@ public class PeopleControllerUt : BaseControllerUt {
    }
    
    [Fact]
-   public async Task Update_NotFound() {
+   public async Task UpdateAsyncUt_NotFound() {
       // Arrange
       var person = _seed.Person1;
       // Setup the repository to return null for the specified id
@@ -203,7 +204,7 @@ public class PeopleControllerUt : BaseControllerUt {
    }
    
    [Fact]
-   public async Task Delete_NoContent() {
+   public async Task DeleteAsyncUt_NoContent() {
       // Arrange
       var person = _seed.Person1;
       // Setup the repository to return null for the specified id
@@ -222,7 +223,7 @@ public class PeopleControllerUt : BaseControllerUt {
    }
    
    [Fact]
-   public async Task Delete_NotFound() {
+   public async Task DeleteAsyncUt_NotFound() {
       // Arrange
       var nonExistentPersonId = Guid.NewGuid();
       _mockPeopleRepository.Setup(r => r.FindByIdAsync(nonExistentPersonId,CancellationToken.None))

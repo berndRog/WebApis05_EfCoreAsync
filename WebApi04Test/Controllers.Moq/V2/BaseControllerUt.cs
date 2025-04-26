@@ -3,7 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using WebApi.Controllers.V2;
 using WebApi.Core;
-namespace WebApiTest.Controllers.Moq;
+using WebApiTest;
+namespace WebApiOrmTest.Controllers.Moq.V2;
 
 public class BaseControllerUt {
    protected readonly Seed _seed;

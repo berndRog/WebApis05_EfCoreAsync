@@ -2,10 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-		<RootNamespace>WebApiOrmTest</RootNamespace>
+		<RootNamespace>WebApiTest</RootNamespace>
 		<Nullable>enable</Nullable>
 		<IsPackable>false</IsPackable>
-		<AssemblyName>WebApiOrm3Test</AssemblyName>
   </PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

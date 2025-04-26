@@ -159,7 +159,7 @@ public class PeopleControllerUt : BaseController {
    }
 
    [Fact]
-   public async Task UpdateUt_NotFound() {
+   public async Task UpdateAsyncUt_NotFound() {
       // Arrange
       var person = _seed.Person2;
       _peopleRepository.Add(person);

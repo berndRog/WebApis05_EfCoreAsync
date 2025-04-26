@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using WebApi.Core;
 using WebApi.Core.DomainModel.Entities;
-namespace WebApi.Data.Repositories_refactored;
+namespace WebApi.Data.Repositories;
 
 public abstract class ABaseRepository<T>(
    DataContext dContext

@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using WebApi.Core;
 using WebApi.Core.DomainModel.Entities;
-using WebApi.Data.Repositories_refactored;
 namespace WebApi.Data.Repositories;
 
 public class PeopleRepository(
@@ -33,6 +32,4 @@ public class PeopleRepository(
       return person;
 
    }
-
-
 }

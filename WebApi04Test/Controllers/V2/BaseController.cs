@@ -27,23 +27,12 @@ public abstract class BaseController {
    protected readonly IDataContext _dataContext;
    protected readonly Seed _seed;
    
-   protected string _webRootPath;
-   protected string _imagesSource;
-   protected string _imagesWwwRootPath;
-   private Mock<IWebHostEnvironment> _mockWebHostEnvironment;
-   
-
    protected BaseController() {
       
       // Create test configuration
       var configuration = new ConfigurationBuilder()
          .AddJsonFile("appsettingsTest.json", optional: false)
          .Build();
-
-      // Set up paths
-      var path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-      // set up IWebHostEnvironment ans image files
-      SetupImages(configuration, path);
       
       // Test DI-Container
       IServiceCollection services = new ServiceCollection();
@@ -96,32 +85,6 @@ public abstract class BaseController {
       _seed = new Seed();
 
    }
-
-   private void SetupImages(IConfiguration configuration, string homePath ) {
-      var localFolder = configuration.GetSection("LocalFolder").Value ??
-         throw new Exception("LocalFolder is not available");
-      localFolder.Split('/').ToList().ForEach(folder => {
-         homePath = Path.Combine(homePath, folder);
-      });
-      if (!Directory.Exists(homePath)) Directory.CreateDirectory(homePath);
-
-      // Set up source and destination directories
-      _imagesSource = Path.Combine(homePath, "Images");
-      if (!Directory.Exists(_imagesSource)) Directory.CreateDirectory(_imagesSource);
-      _webRootPath = Path.Combine(homePath, $"wwwroot");
-      if (!Directory.Exists(_webRootPath)) Directory.CreateDirectory(_webRootPath);
-      _imagesWwwRootPath = Path.Combine(_webRootPath, "images");
-      if(!Directory.Exists(_imagesWwwRootPath)) Directory.CreateDirectory(_imagesWwwRootPath);
-
-      // Create web environment
-      _mockWebHostEnvironment = new Mock<IWebHostEnvironment>();
-      _mockWebHostEnvironment.Setup(env => env.WebRootPath).Returns(_webRootPath);
-      _mockWebHostEnvironment.Setup(env => env.ContentRootPath).Returns(_webRootPath);
-      _mockWebHostEnvironment.Setup(env => env.EnvironmentName).Returns("Test");
-      _mockWebHostEnvironment.Setup(env => env.WebRootFileProvider).Returns(new PhysicalFileProvider(_webRootPath));
-
-   } 
-   
    
    public static string ToPrettyJson(
       string text, 
